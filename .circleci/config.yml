@@ -168,7 +168,6 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
-      - aws-cli-cred-setup:
-          context: aws
+      - aws-cli-cred-setup
       - deploy-infrastructure:
           requires: [aws-cli-cred-setup]
