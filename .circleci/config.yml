@@ -108,13 +108,6 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-  aws-cli-cred-setup:
-    executor: aws-cli/default
-    steps:
-      - aws-cli/setup:
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          aws-region: AWS_DEFAULT_REGION
 
   deploy-infrastructure:
     docker:
@@ -123,6 +116,10 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_DEFAULT_REGION
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -168,6 +165,4 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
-      - aws-cli-cred-setup
-      - deploy-infrastructure:
-          requires: [aws-cli-cred-setup]
+      - deploy-infrastructure
