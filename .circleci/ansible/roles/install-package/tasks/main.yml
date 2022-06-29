@@ -12,6 +12,7 @@
     sudo apt-get install -y python3 python3-pip
 
 - name: Install node npm nvmm
+  become: true
   become_user: ubuntu
   shell: |
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
