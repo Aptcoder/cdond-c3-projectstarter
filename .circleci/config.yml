@@ -205,6 +205,10 @@ jobs:
           command: |
             apk add --update aws-cli
       - run:
+          name: check envs
+          command: |
+            printenv
+      - run:
           name: Run migrations
           command: |
             cd backend
