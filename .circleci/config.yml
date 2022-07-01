@@ -201,6 +201,10 @@ jobs:
       # Checkout code from git
       - checkout
       - run:
+          name: Install aws cli
+          command: |
+            apk add --update aws-cli
+      - run:
           name: Run migrations
           command: |
             cd backend
