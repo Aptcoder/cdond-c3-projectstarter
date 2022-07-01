@@ -8,6 +8,15 @@
   shell: |
     ls
     pwd
+  register: print_result
+
+- name: print message
+  debug:
+    msg: "{{ print_result.stdout_lines }}"
+
+- name: create backend directory
+  shell: |
+    mkdir -p backend
 
 - name: Unarchive files
   unarchive:
