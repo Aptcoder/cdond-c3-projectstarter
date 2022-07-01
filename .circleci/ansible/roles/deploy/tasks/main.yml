@@ -18,10 +18,15 @@
   shell: |
     mkdir -p backend
 
-- name: Unarchive files
-  unarchive:
+- name: Copy archive file
+  copy:
     src: ~/project/artifact.tar.gz
     dest: backend
+
+- name: Unarchive files
+  shell: |
+    cd backend
+    tar -xvf artifact.tar.gz
 
 - name: Start backend
   shell: |
