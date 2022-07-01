@@ -201,10 +201,6 @@ jobs:
       # Checkout code from git
       - checkout
       - run:
-          name: Install aws cli
-          command: |
-            apk add --update aws-cli
-      - run:
           name: check envs
           command: |
             printenv
@@ -224,7 +220,7 @@ jobs:
                 curl https://kvdb.io/DcDWU6rjf1EW7Z8Qk7tXot/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
       # Here's where you will add some code to rollback on failure
-      - destroy-environment
+
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
