@@ -224,12 +224,13 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies
           command: |
             apk add --update tar gzip nodejs npm ansible curl aws-cli
+      - attach_workspace:
+          at: ~/
+
       - run:
           name: Get backend url
           command: |
