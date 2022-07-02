@@ -302,7 +302,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
-            eexport BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=UdaPeopleBack" --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=UdaPeopleBack" --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
