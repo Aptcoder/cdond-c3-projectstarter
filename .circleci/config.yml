@@ -340,6 +340,19 @@ jobs:
           command: |
             apk add --update curl aws-cli
       - run:
+          name: Get previous workflow id
+          commands: |
+            export OldWorkflowID=$(aws cloudformation \
+                list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                --no-paginate --output text)
+            echo "${OldWorkflowID}" >> ~/project/oldworkflowid.txt
+
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/oldworkflowid.txt
+
+      - run:
           name: Update cloudfront distribution
           command: |
             aws cloudformation deploy \
@@ -358,20 +371,13 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update curl aws-cli
-      - run:
-          name: Get old stack workflow id
-          command: |
-            export OldWorkflowID=$(aws cloudformation \
-                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-                    --no-paginate --output text)
-            echo OldWorkflowID: "${OldWorkflowID}"
-            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+      - attach_workspace:
+          at: ~/
+
       - run:
           name: Remove old stacks and files
           command: |
-            export OldWorkflowID=$(aws cloudformation \
-            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            --no-paginate --output text)
+            export OldWorkflowID=$(cat oldworkflowid.txt)
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
