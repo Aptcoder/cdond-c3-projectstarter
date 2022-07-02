@@ -7,6 +7,11 @@ commands:
       # Add parameter here
     steps:
       - run:
+          name: Empty s3 bucket
+          when: on_fail
+          command: |
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - run:
           name: Destroy back-end infra
           when: on_fail
           command: |
@@ -323,6 +328,26 @@ jobs:
             else
               return 1
             fi
+      - destroy-environment
+      - revert-migrations
+
+  cloudfront-update:
+    docker:
+      - image: python:3.10.0-alpine
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip nodejs npm ansible curl aws-cli
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name InitialStack \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
       - destroy-environment
       - revert-migrations
 
