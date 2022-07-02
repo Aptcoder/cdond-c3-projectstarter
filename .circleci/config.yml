@@ -166,7 +166,7 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances --filters "Name=tag-value,Values=UdaPeopleBack" --query "sort_by(Reservations[].Instances[], &LaunchTime)[:-1].[PublicIpAddress]" --output text >> ~/project/.circleci/ansible/inventory.txt
+            aws ec2 describe-instances --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query "Reservations[*].Instances[*].PublicIpAddress" --output text >> ~/project/.circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
@@ -239,7 +239,7 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=UdaPeopleBack" --query "sort_by(Reservations[].Instances[], &LaunchTime)[:-1].[PublicIpAddress]" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
@@ -301,13 +301,13 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=UdaPeopleBack" --query "sort_by(Reservations[].Instances[], &LaunchTime)[:-1].[PublicIpAddress]" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
       - run:
           name: Backend smoke test.
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=UdaPeopleBack" --query "sort_by(Reservations[].Instances[], &LaunchTime)[:-1].[PublicIpAddress]" --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
@@ -355,10 +355,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: |
-            apk add --update curl aws-cli
-      - run:
           name: Get old stack workflow id
           command: |
             export OldWorkflowID=$(aws cloudformation \
@@ -381,7 +377,7 @@ jobs:
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             else
-               echo "------------ Can not clean up ------------"
+              echo "-----------Can not clean up"
             fi
 
 workflows:
