@@ -35,3 +35,4 @@
   roles:
     # Your code here
     - install-package
+    - configure-prometheus-node-exporter
